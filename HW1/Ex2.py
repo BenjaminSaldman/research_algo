@@ -25,7 +25,12 @@ def breadth_first_search(start, end, neighbor_function):
         x = q.get()
         if x == end:
             break
-        for y in neighbor_function(x):
+        neighbors = []
+        if type(neighbor_function(x)) == dict:
+            neighbors = list(neighbor_function(x).values())
+        else:
+            neighbors = list(neighbor_function(x))
+        for y in neighbors:
             if y not in visited:
                 visited.append(y)
                 q.put(y)
@@ -61,6 +66,7 @@ print(f"Ex2 examples: ")
 print(breadth_first_search(start=(0, 0), end=(2, 2), neighbor_function=four_neighbor_function))
 print(breadth_first_search(start=(0, 0), end=(2, 2), neighbor_function=x_powers))
 print(breadth_first_search(start=(0, 0, 0), end=(2, 2, 2), neighbor_function=three_neighbors))
+
 print(f"############################################################")
 
 doctest.testmod(verbose=True)
