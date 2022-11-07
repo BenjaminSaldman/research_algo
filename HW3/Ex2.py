@@ -53,10 +53,12 @@ def z(x: tuple):
 
 
 
-#doctest.testmod()
-# f(2)
-# f(2)
-# y('ABC')
-# y('ABC')
-# z((1, 2, 3))
-# z((1, 2, 3))
+doctest.testmod()
+if __name__ == '__main__':
+
+    f(2)
+    f(2)
+    y('ABC')
+    y('ABC')
+    z((1, 2, 3))
+    z((1, 2, 3))
