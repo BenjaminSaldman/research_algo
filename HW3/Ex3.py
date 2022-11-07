@@ -25,7 +25,15 @@ class List(list):
             return super().__getitem__(item)
 
     def __setitem__(self, key, value):
-        pass
+        if isinstance(key, tuple):
+            ret = super().__getitem__(key[0])
+            for i in key[1:len(key)-1]:
+                ret = ret[i]
+            ret.__setitem__(i+1, value)
+            print(ret)
+            super().__setitem__(key[0], ret)
+        else:
+            super().__setitem__(key, value)
 
 
 mylist = List([
