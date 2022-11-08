@@ -1,4 +1,6 @@
 import doctest
+
+
 def lastcall(func=callable, d={}):
     """
     as told us in the first lecture, when you define a data structure with default value it
@@ -25,8 +27,8 @@ def lastcall(func=callable, d={}):
             key.append(i)
         for i in kwargs.items():
             key.append(i)
-        key.append(func.__name__)
-        key = tuple(key) #convert the given value into a dict.
+        key.append(func.__name__)  # saving the function name in the key to avoid: x(5)=y(5).
+        key = tuple(key)  # convert the given value into a dict.
         if key in d.keys():
             print(f"I already told you that the answer is {d[key]}")
             return
@@ -52,10 +54,8 @@ def z(x: tuple):
     return x
 
 
-
 doctest.testmod()
 if __name__ == '__main__':
-
     f(2)
     f(2)
     y('ABC')
