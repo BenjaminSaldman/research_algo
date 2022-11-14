@@ -1,11 +1,9 @@
 import re
 import doctest
+
 # regex of valid email address according to: https://help.xmatters.com/ondemand/trial/valid_email_format.htm
 # Helped with: https://www.codexpedia.com/regex/regex-symbol-list-and-regex-examples/
 regex = r'\b([A-Za-z0-9]+([A-Za-z0-9]*[._-][A-Za-z0-9])*[A-Za-z0-9]*)+@([A-Za-z0-9]+([A-Za-z0-9]*[._-][A-Za-z0-9])*[A-Za-z0-9]*)+\.[A-Za-z]{2,}\b'
-
-
-
 
 
 def Ex1(filename: str):
@@ -31,6 +29,8 @@ def Ex1(filename: str):
 
     print(f"Valid: {valid}")
     print(f"Invalid: {invalid}")
+
+
 if __name__ == '__main__':
     doctest.testmod()
     filename = input("Please enter the file name: ")
