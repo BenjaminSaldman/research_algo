@@ -36,7 +36,7 @@ class bounded_subsets:
                 self.visited[i] = True
                 return p
         if self.visited[i]:
-            self.i=i
+            self.i = i
             return self.calc_next(i + 1)
         return None
 
@@ -56,6 +56,5 @@ if __name__ == '__main__':
     for s in t:
         print(s)
 
-    for s in bounded_subsets(range(50, 150), 170):
+    for s in bounded_subsets(range(50, 150), 103):
         print(s)
-
