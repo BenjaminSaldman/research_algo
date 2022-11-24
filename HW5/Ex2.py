@@ -1,4 +1,4 @@
-from typing import Callable, Any
+from typing import Callable
 
 import math
 
@@ -52,7 +52,7 @@ def greedy_tsp(graph):
     cities = 1
     min = math.inf
     visited = {}
-    for i in range(len(graph) + 1):
+    for i in range(len(graph)):
         visited[i] = False
     col = 0
     row = 0
