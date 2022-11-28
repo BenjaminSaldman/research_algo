@@ -140,28 +140,30 @@ def greedy_tsp(graph):
 
 def brute_force_tsp(graph):
     """
-    'Brute Force' solution to the TSP.
-    We are starting from the first vertex and find the best
+    'Brute Force' naive solution to the TSP.
+    We are starting from the random vertex and find the best
     hamiltonian cycle in the graph moving on all permutations of
     the vertices.
     """
-    nodes = [i for i in range(1, len(graph))]  # Nodes of the graph without the first.
     min_cost = math.inf  # Best cost path.
     curr_path = []  # Current path to compute.
     path = []  # Path to return.
-    for perm in itertools.permutations(nodes):
-        curr_cost = 0  # Current path cost.
-        curr_row = 0  # Current vertex we visiting.
-        for i in perm:
-            curr_cost += graph[curr_row][i][1][1]  # Adding the cost of the edge.
-            curr_path.append(graph[curr_row][i])
-            curr_row = i  # Update the next vertex.
-        curr_cost += graph[curr_row][0][1][1]  # Closing the cycle.
-        curr_path.append(graph[curr_row][0])
-        if min_cost > curr_cost:  # Update the minimum cost and the best path to return.
-            path = curr_path
-            min_cost = curr_cost
-        curr_path = []
+    for j in range(len(graph)):
+        nodes = [i for i in range(len(graph))]  # Nodes of the graph without the first.
+        nodes.pop(j)
+        for perm in itertools.permutations(nodes):
+            curr_cost = 0  # Current path cost.
+            curr_row = j  # Current vertex we're starting at.
+            for i in perm:
+                curr_cost += graph[curr_row][i][1][1]  # Adding the cost of the edge.
+                curr_path.append(graph[curr_row][i])
+                curr_row = i  # Update the next vertex.
+            curr_cost += graph[curr_row][j][1][1]  # Closing the cycle.
+            curr_path.append(graph[curr_row][j])
+            if min_cost > curr_cost:  # Update the minimum cost and the best path to return.
+                path = curr_path
+                min_cost = curr_cost
+            curr_path = []
     return path
 
 
