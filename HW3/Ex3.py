@@ -38,16 +38,18 @@ class List(list):
 mylist = List([
     [[1, 2, 3, 33], [4, 5, 6, 66]],
     [[7, 8, 9, 99], [10, 11, 12, 122]],
-    [[13, 14, 15, 155], [16, 17, 18, 188]],
+    [[13, 14, 15, 155], [16, 17, [18, 188]]],
 ]
 )
-print(mylist)
-print(len(mylist))
-print(mylist[0, 1, 3])
-print(mylist[0])
-print(mylist[1, 1, 3])
-mylist[1, 1, 3] = 7
-print(mylist)
-mylist.append(5)
-print(mylist)
+# print(mylist)
+# print(len(mylist))
+# print(mylist[0, 1, 3])
+# print(mylist[0])
+# print(mylist[1, 1, 3])
+# mylist[1, 1, 3] = 7
+# print(mylist)
+# mylist.append(5)
+# print(mylist)
+print(mylist[2, 1, 2, 1])
+print(mylist[2][1][2][1])
 doctest.testmod()

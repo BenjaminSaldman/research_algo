@@ -96,3 +96,7 @@ if __name__ == '__main__':
         print(s)
     for s in zip(range(5), bounded_subsets(range(100), 10000000000000000000)):
         print(s)
+    for s in bounded_subsets(list(range(90, 100)) + list(range(920, 1000)), 1000):
+        print(s)
+
+
