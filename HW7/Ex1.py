@@ -2,17 +2,22 @@ import time
 
 import numpy as np
 import cvxpy as cp
+import matplotlib.pyplot as plt
 import random
 import sys
+import doctest
 
 MAX_SIZE = sys.maxsize
-TRESHOLD = 15
+TRESHOLD = 5
 
 
 def _generate_eq():
-    vars = random.randint(1, TRESHOLD)
-    equations = vars
-    eq = []
+    """
+    System of linear equations generator.
+    """
+    vars = random.randint(1, TRESHOLD)  # Number of variables.
+    equations = vars  # Number of equations.
+    eq = []  # Equations.
     solutions = []
     for i in range(equations):
         temp = []
@@ -28,14 +33,28 @@ def _generate_eq():
 
 
 def numpy_solver(eq_sol: tuple):
-    equations = eq_sol[0]  # np.array(eq_sol[0])
-    solutions = eq_sol[1]  # np.array(eq_sol[1])
+    """
+    Solving the system of linear equations using numpy.linalg.
+    >>> numpy_solver((np.array([[4, 4, 3],[3, 1, 1],[1, 4, 2]]), np.array([3, 0, 1])))
+    array([-1., -2.,  5.])
+    >>> numpy_solver((np.array([[1]]), np.array([1])))
+    array([1.])
+    """
+    equations = eq_sol[0]
+    solutions = eq_sol[1]
     return np.linalg.solve(equations, solutions)
 
 
 def cvxpy_solver(eq_sol: tuple):
-    A = eq_sol[0]  # np.array(eq_sol[0])
-    b = eq_sol[1]  # np.array(eq_sol[1])
+    """
+    Solving the system of linear equations using cvxpy.
+    >>> cvxpy_solver((np.array([[4, 4, 3],[3, 1, 1],[1, 4, 2]]), np.array([3, 0, 1])))
+    array([-1., -2.,  5.])
+    >>> cvxpy_solver((np.array([[1]]), np.array([1])))
+    array([1.])
+    """
+    A = eq_sol[0]
+    b = eq_sol[1]
     x = cp.Variable(len(b))
     prob = cp.Problem(cp.Minimize(cp.sum(A @ x - b)), [cp.matmul(A, x) == b])
     prob.solve()
@@ -45,7 +64,7 @@ def cvxpy_solver(eq_sol: tuple):
 def calc_times():
     np_container = {}
     cp_container = {}
-    for i in range(15):
+    for i in range(50):
         A = _generate_eq()
         t1 = time.time()
         numpy_solver(A)
@@ -59,6 +78,20 @@ def calc_times():
 
 
 A = _generate_eq()
+print(A)
 print(numpy_solver(A))
 print(cvxpy_solver(A))
 print(calc_times())
+np_container, cp_container = calc_times()
+x1 = list(i for i in np_container.keys())
+y1 = list(i for i in np_container.values())
+x2 = list(i for i in cp_container.keys())
+y2 = list(i for i in cp_container.values())
+plt.plot(x2, y2, 'r', label="Cvxpy")
+plt.plot(x1, y1, 'b', label="Numpy")
+plt.title("Numpy vs Cvxpy")
+plt.xlabel("Matrix size")
+plt.ylabel("Time in seconds")
+plt.legend(loc="upper left")
+plt.show()
+print("We can conclude that numpy runs much faster than Cvxpy")
