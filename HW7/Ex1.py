@@ -8,7 +8,7 @@ import sys
 import doctest
 
 MAX_SIZE = sys.maxsize
-TRESHOLD = 5
+TRESHOLD = 15
 
 
 def _generate_eq():
