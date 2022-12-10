@@ -50,4 +50,5 @@ for i in probs.keys():
     index += 1
     plt.plot(x, y)
 plt.show()
+doctest.testmod()
 print("We can see that the approximation is much better than the rate that presented in the paper.")
