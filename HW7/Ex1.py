@@ -8,7 +8,7 @@ import sys
 import doctest
 
 MAX_SIZE = sys.maxsize
-TRESHOLD = 15
+TRESHOLD = 25
 
 
 def _generate_eq():
@@ -78,7 +78,6 @@ def calc_times():
 
 
 A = _generate_eq()
-print(A)
 print(numpy_solver(A))
 print(cvxpy_solver(A))
 print(calc_times())
