@@ -1,5 +1,6 @@
 """
 Author - Benjamin Saldman
+Solution for question number 2.
 """
 
 import doctest
