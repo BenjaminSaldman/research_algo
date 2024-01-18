@@ -78,32 +78,9 @@ def weighted_round_robin(rights: list[float], valuations: list[list[float]], y: 
     Player number: 2 chooses resource: 4 with value of: 11
     Player number: 1 chooses resource: 5 with value of: 11
 
-    >>> weighted_round_robin(rights=[1, 2, 4], valuations=[[11, 11, 11], [11, 11, 11, 11, 11, 11], [11, 11, 11, 11, 11, 11]], y=0.5)
-    Player number: 2 chooses resource: 0 with value of: 11
-    Player number: 1 chooses resource: 1 with value of: 11
-    Player number: 2 chooses resource: 2 with value of: 11
-    Player number: 0 chooses resource: 3 with value of: 0
-    Player number: 2 chooses resource: 4 with value of: 11
-    Player number: 1 chooses resource: 5 with value of: 11
-
-    >>> weighted_round_robin(rights=[2, 2, 2], valuations=[[11, 11, 11], [11, 11, 11, 11, 11, 11], [11, 11, 11, 11, 11, 11]], y=0.5)
-    Player number: 0 chooses resource: 0 with value of: 11
-    Player number: 1 chooses resource: 1 with value of: 11
-    Player number: 2 chooses resource: 2 with value of: 11
-    Player number: 0 chooses resource: 3 with value of: 0
-    Player number: 1 chooses resource: 4 with value of: 11
-    Player number: 2 chooses resource: 5 with value of: 11
     """
     num_of_players = len(rights)  # Total number of players
-    maximum = 0
-    for i in valuations:
-        if len(i) > maximum:
-            maximum = len(i)
-    num_of_resources = maximum  # Number of resources.
-    for i in range(num_of_players): # If players don't want some resources, set them to 0.
-        if len(valuations[i]) < num_of_resources:
-            for j in range(len(valuations[i]), num_of_resources):
-                valuations[i].append(0)
+    num_of_resources = len(valuations[0])  # Number of resources.
     items = [0 for i in
              range(num_of_players)]  # Number of items that player i got. First, none of them getting an item.
     resources = [1 for i in range(
