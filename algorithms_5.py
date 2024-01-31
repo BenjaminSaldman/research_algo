@@ -15,6 +15,8 @@ def is_pareto_efficient(valuations: list[list[float]], allocations: list[list[fl
             if i == j:
                 continue
             indices = [k for k in range(num_of_items) if allocations[i][k] != 0]
+            if indices == []: # If player i doesn't have anything in its basket, then there is no edge i->j.
+                continue
             # The minimum ratio between some item that is in the basket of i to j.
             val = min(valuations[i][k] / valuations[j][k] for k in indices)
             edge = (i, j, val)
@@ -52,6 +54,8 @@ def is_pareto_efficient_improve(valuations: list[list[float]], allocations: list
             if i == j:
                 continue
             indices = [k for k in range(num_of_items) if allocations[i][k] != 0]
+            if indices == []:
+                continue
             val = min(valuations[i][k] / valuations[j][k] for k in indices)
             edge = (i, j, val)
             item = min(indices, key=lambda k: valuations[i][k] / valuations[j][k])  # The index of the item.
@@ -86,3 +90,5 @@ def is_pareto_efficient_improve(valuations: list[list[float]], allocations: list
 
 print(is_pareto_efficient_improve(
     valuations=[[10, 20, 30, 40], [40, 30, 20, 10]], allocations=[[1, 0.7, 1, 0], [0, 0.3, 0, 0]]))
+print(is_pareto_efficient_improve(
+    valuations=[[10, 20, 30, 40], [40, 30, 20, 10]], allocations=[[1, 1, 1, 1], [0, 0, 0, 0]]))
