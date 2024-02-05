@@ -74,23 +74,23 @@ def is_pareto_efficient_improve(valuations: list[list[float]], allocations: list
             edge2 = (i, j, item)
             matrix.append(edge)
             items[(i, j)] = edge2
-            val_normal = min(valuations[i][k] / valuations[j][k] for k in indices)
+            val_normal = min(valuations[i][k] / valuations[j][k] for k in indices)  # Original weight, without log.
             edge_normal = (i, j, val_normal)
-            matrix2.append(edge_normal)
+            matrix2.append(edge_normal)  # Saving the original weight.
     G = nx.DiGraph()
-    G_weights = nx.DiGraph()
+    G_weights = nx.DiGraph()  # The original graph.
     for i in matrix:
         G.add_edge(i[0], i[1], weight=i[2])
     for i in matrix2:
         G_weights.add_edge(i[0], i[1], weight=i[2])
     cycles = []
-    for i in matrix:
+    for i in matrix: # Finding all possible negative cycles.
         try:
             c = nx.find_negative_cycle(G, i[0])
             cycles.append(c)
         except:
             continue
-    if cycles == []:
+    if cycles == []: # If no negative cycle was found, return true.
         return True
     cycle = cycles[0]
     epsilon = 1 / 1000  # Player A chooses e from x.
