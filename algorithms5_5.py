@@ -15,6 +15,8 @@ def is_pareto_efficient(valuations: list[list[float]], allocations: list[list[fl
     True
     >>> is_pareto_efficient_improve(valuations=[[10, 20, 30, 40], [40, 30, 20, 10]], allocations=[[0, 0, 0, 0], [1, 1, 1, 1]])
     True
+    >>> is_pareto_efficient(valuations=[[10, 20, 30, 40], [40, 30, 20, 10]],allocations=[[0, 0.5, 1, 1], [1, 0.5, 0, 0]])
+    True
     >>> is_pareto_efficient(valuations=[[10, 20, 30, 40], [40, 30, 20, 10]], allocations=[[1, 0.7, 1, 0], [0, 0.3, 0, 0]])
     False
     >>> is_pareto_efficient(valuations=[[10, 20, 30, 40], [40, 30, 20, 10], [40, 30, 20, 10]],allocations=[[1, 1, 0, 0], [0, 0, 0, 1], [0, 0, 1, 0]])
@@ -51,9 +53,9 @@ def is_pareto_efficient_improve(valuations: list[list[float]], allocations: list
     >>> is_pareto_efficient_improve(valuations=[[10, 20, 30, 40], [40, 30, 20, 10],[40, 30, 20, 10]], allocations=[[0, 0, 0, 0],[0, 0, 0, 0], [1, 1, 1, 1]])
     True
     >>> is_pareto_efficient_improve(valuations=[[10, 20, 30, 40], [40, 30, 20, 10]], allocations=[[1, 0.7, 1, 0], [0, 0.3, 0, 0]])
-    [[0.99, 0.82, 1, 0], [0.01, 0.18, 0, 0]]
+    [[0.9999, 0.7001333333333333, 1, 0], [0.0001, 0.29986666666666667, 0, 0]]
     >>> is_pareto_efficient_improve(valuations=[[10, 20, 30, 40], [40, 30, 20, 10], [40, 30, 20, 10]],allocations=[[1, 1, 0, 0], [0, 0, 0, 1], [0, 0, 1, 0]])
-    [[0.99, 1, 0, 0.04], [0.01, 0, 0, 0.96], [0, 0, 1, 0]]
+    [[0.9999, 1, 0, 0.0004], [0.0001, 0, 0, 0.9996], [0, 0, 1, 0]]
     """
     num_of_players = len(valuations)
     num_of_items = len(valuations[0])
@@ -84,13 +86,13 @@ def is_pareto_efficient_improve(valuations: list[list[float]], allocations: list
     for i in matrix2:
         G_weights.add_edge(i[0], i[1], weight=i[2])
     cycles = []
-    for i in matrix: # Finding all possible negative cycles.
+    for i in matrix:  # Finding all possible negative cycles.
         try:
             c = nx.find_negative_cycle(G, i[0])
             cycles.append(c)
         except:
             continue
-    if cycles == []: # If no negative cycle was found, return true.
+    if cycles == []:  # If no negative cycle was found, return true.
         return True
     cycle = cycles[0]
     epsilon = 1 / 1000  # Player A chooses e from x.
@@ -98,8 +100,8 @@ def is_pareto_efficient_improve(valuations: list[list[float]], allocations: list
         u, v = cycle[i], cycle[(i + 1)]  # Getting the edge u->v.
         weight = G_weights.get_edge_data(u, v).get('weight')
         item = items[(u, v)][2]  # Item X of A which we added the edge A->B.
-        allocations[v][item] += epsilon * valuations[u][item]  # A gives B e part from x.
-        allocations[u][item] -= epsilon * valuations[u][item]  # Decrease from A the part it gave to B.
+        allocations[v][item] += (epsilon / valuations[u][item])  # A gives B e part from x.
+        allocations[u][item] -= (epsilon / valuations[u][item])  # Decrease from A the part it gave to B.
         epsilon = epsilon / weight  # For B it equals to e/r and so on.
     return allocations  # Return the pareto improvement allocation.
 
