@@ -1,5 +1,6 @@
 import networkx as nx
 import doctest
+import math
 
 
 def is_pareto_efficient(valuations: list[list[float]], allocations: list[list[float]]):
@@ -13,6 +14,8 @@ def is_pareto_efficient(valuations: list[list[float]], allocations: list[list[fl
     >>> is_pareto_efficient_improve(valuations=[[10, 20, 30, 40], [40, 30, 20, 10]], allocations=[[1, 1, 1, 1], [0, 0, 0, 0]])
     True
     >>> is_pareto_efficient_improve(valuations=[[10, 20, 30, 40], [40, 30, 20, 10]], allocations=[[0, 0, 0, 0], [1, 1, 1, 1]])
+    True
+    >>> is_pareto_efficient(valuations=[[10, 20, 30, 40], [40, 30, 20, 10]],allocations=[[0, 0.5, 1, 1], [1, 0.5, 0, 0]])
     True
     >>> is_pareto_efficient(valuations=[[10, 20, 30, 40], [40, 30, 20, 10]], allocations=[[1, 0.7, 1, 0], [0, 0.3, 0, 0]])
     False
@@ -32,26 +35,13 @@ def is_pareto_efficient(valuations: list[list[float]], allocations: list[list[fl
             if indices == []:  # If player i doesn't have anything in its basket, then there is no edge i->j.
                 continue
             # The minimum ratio between some item that is in the basket of i to j.
-            val = min(valuations[i][k] / valuations[j][k] for k in indices)
+            val = min(math.log(valuations[i][k] / valuations[j][k], math.e) for k in indices)
             edge = (i, j, val)
             matrix.append(edge)
     G = nx.DiGraph()  # Creating a directed graph and adding the edges and weights.
     for i in matrix:
         G.add_edge(i[0], i[1], weight=i[2])
-
-    for cycle in nx.simple_cycles(G):  # Iterating over all simple cycles in G.
-        weights = []  # Weights of the path.
-        a = 1  # The multiplication of the weights
-        cycle.append(cycle[0])  # Add the last node to the cycle - i->j->k->i (for example).
-        for i in range(len(cycle) - 1):
-            u, v = cycle[i], cycle[(i + 1)]  # Getting the edge u->v.
-            weight = G.get_edge_data(u, v).get('weight')  # Get the weight of the edge.
-            weights.append(weight)
-        for i in weights:
-            a *= i
-        if a < 1:  # If the multiplication of the weights is < 1, then the allocation is not Pareto efficient.
-            return False
-    return True
+    return not nx.negative_edge_cycle(G)  # The function returns true if there exists a negative cycle.
 
 
 def is_pareto_efficient_improve(valuations: list[list[float]], allocations: list[list[float]]):
@@ -63,13 +53,14 @@ def is_pareto_efficient_improve(valuations: list[list[float]], allocations: list
     >>> is_pareto_efficient_improve(valuations=[[10, 20, 30, 40], [40, 30, 20, 10],[40, 30, 20, 10]], allocations=[[0, 0, 0, 0],[0, 0, 0, 0], [1, 1, 1, 1]])
     True
     >>> is_pareto_efficient_improve(valuations=[[10, 20, 30, 40], [40, 30, 20, 10]], allocations=[[1, 0.7, 1, 0], [0, 0.3, 0, 0]])
-    [[0.99, 0.7, 1, 0], [0.01, 0.3, 0, 0]]
+    [[0.9999, 0.7001333333333333, 1, 0], [0.0001, 0.29986666666666667, 0, 0]]
     >>> is_pareto_efficient_improve(valuations=[[10, 20, 30, 40], [40, 30, 20, 10], [40, 30, 20, 10]],allocations=[[1, 1, 0, 0], [0, 0, 0, 1], [0, 0, 1, 0]])
-    [[0.99, 1, 0, 0], [0, 0, 0.08, 1], [0.01, 0, 0.92, 0]]
+    [[0.9999, 1, 0, 0.0004], [0.0001, 0, 0, 0.9996], [0, 0, 1, 0]]
     """
     num_of_players = len(valuations)
     num_of_items = len(valuations[0])
     matrix = []
+    matrix2 = []
     items = dict()
     for i in range(num_of_players):
         for j in range(num_of_players):
@@ -78,36 +69,41 @@ def is_pareto_efficient_improve(valuations: list[list[float]], allocations: list
             indices = [k for k in range(num_of_items) if allocations[i][k] != 0]
             if indices == []:
                 continue
-            val = min(valuations[i][k] / valuations[j][k] for k in indices)
+            val = min(math.log(valuations[i][k] / valuations[j][k], math.e) for k in indices)
             edge = (i, j, val)
-            item = min(indices, key=lambda k: valuations[i][k] / valuations[j][k])  # The index of the item.
+            item = min(indices,
+                       key=lambda k: math.log(valuations[i][k] / valuations[j][k], math.e))  # The index of the item.
             edge2 = (i, j, item)
             matrix.append(edge)
             items[(i, j)] = edge2
+            val_normal = min(valuations[i][k] / valuations[j][k] for k in indices)  # Original weight, without log.
+            edge_normal = (i, j, val_normal)
+            matrix2.append(edge_normal)  # Saving the original weight.
     G = nx.DiGraph()
+    G_weights = nx.DiGraph()  # The original graph.
     for i in matrix:
         G.add_edge(i[0], i[1], weight=i[2])
-
-    for cycle in nx.simple_cycles(G):
-        weights = []
-        a = 1
-        for i in cycle:
-            u, v = cycle[i], cycle[(i + 1) % len(cycle)]
-            weight = G.get_edge_data(u, v).get('weight')
-            weights.append(weight)
-        for i in weights:
-            a *= i
-        if a < 1:
-            epsilon = 1 / 1000  # Player A chooses e from x.
-            for i in range(len(cycle) - 1):
-                u, v = cycle[i], cycle[(i + 1)]  # Getting the edge u->v.
-                weight = G.get_edge_data(u, v).get('weight')
-                item = items[(u, v)][2]  # Item X of A which we added the edge A->B.
-                allocations[v][item] += epsilon * valuations[u][item]  # A gives B e part from x.
-                allocations[u][item] -= epsilon * valuations[u][item]  # Decrease from A the part it gave to B.
-                epsilon = epsilon / weight  # For B it equals to e/r and so on.
-            return allocations  # Return the pareto improvement allocation.
-    return True
+    for i in matrix2:
+        G_weights.add_edge(i[0], i[1], weight=i[2])
+    cycles = []
+    for i in matrix:  # Finding all possible negative cycles.
+        try:
+            c = nx.find_negative_cycle(G, i[0])
+            cycles.append(c)
+        except:
+            continue
+    if cycles == []:  # If no negative cycle was found, return true.
+        return True
+    cycle = cycles[0]
+    epsilon = 1 / 1000  # Player A chooses e from x.
+    for i in range(len(cycle) - 1):
+        u, v = cycle[i], cycle[(i + 1)]  # Getting the edge u->v.
+        weight = G_weights.get_edge_data(u, v).get('weight')
+        item = items[(u, v)][2]  # Item X of A which we added the edge A->B.
+        allocations[v][item] += (epsilon / valuations[u][item])  # A gives B e part from x.
+        allocations[u][item] -= (epsilon / valuations[u][item])  # Decrease from A the part it gave to B.
+        epsilon = epsilon / weight  # For B it equals to e/r and so on.
+    return allocations  # Return the pareto improvement allocation.
 
 
 if __name__ == '__main__':
